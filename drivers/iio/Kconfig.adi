@@ -36,7 +36,6 @@ config IIO_ALL_ADI_DRIVERS
 	select AD7173
 	select AD7266
 	select AD7291
-	select AD7293
 	select AD7298
 	select AD738X
 	select AD7923
@@ -80,7 +79,6 @@ config IIO_ALL_ADI_DRIVERS
 	select AD5380
 	select AD5421
 	select AD5624R_SPI if SPI
-	select AD3552R
 	select AD5064
 	select AD5504
 	select AD5446
@@ -119,6 +117,7 @@ config IIO_ALL_ADI_DRIVERS
 	select CF_AXI_DDS_AD9122
 	select CF_AXI_DDS_AD9144
 	select CF_AXI_DDS_AD9739A
+	select CF_AXI_DDS_AD978X
 	select HMC7044
 	select CF_AXI_DDS_AD9162
 	select CF_AXI_DDS_AD9172
