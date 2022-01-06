@@ -598,6 +598,7 @@ static ssize_t hmc7044_sync_pin_mode_store(struct device *dev,
 {
 	struct iio_dev *indio_dev = dev_to_iio_dev(dev);
 	struct hmc7044 *hmc = iio_priv(indio_dev);
+	struct clk *sync_clk;
 	int i, ret = -EINVAL;
 
 	i = sysfs_match_string(sync_pin_modes, buf);
@@ -605,6 +606,30 @@ static ssize_t hmc7044_sync_pin_mode_store(struct device *dev,
 		mutex_lock(&hmc->lock);
 		ret = hmc7044_sync_pin_set(indio_dev, i);
 		mutex_unlock(&hmc->lock);
+	}
+
+	if (ret)
+		return ret;
+
+	sync_clk = clk_get(dev, "sync_clk");
+	if (!IS_ERR(sync_clk)) {
+		/*
+		 * Setup sync_clk to generate 1 pulse on clk_enable,
+		 * if it is not configured to do that already.
+		 */
+		i = clk_get_nshot(sync_clk);
+		if (i < 0)
+			return ret;
+
+		if (i != 1) {
+			ret = clk_set_nshot(sync_clk, 1);
+			if (ret < 0)
+				return ret;
+		}
+
+		clk_prepare_enable(sync_clk);
+		clk_disable_unprepare(sync_clk);
+		clk_put(sync_clk);
 	}
 
 	return ret ? ret : len;
